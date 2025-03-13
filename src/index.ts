@@ -19,6 +19,15 @@ class Weather {
   constructor() {
     console.error('[Setup] Initializing Weather server...');
 
+    this.axiosInstance = axios.create({
+      baseURL: 'https://api.open-meteo.com/v1/forecast', // Base URL without parameters
+      timeout: 5000,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+
     this.server = new Server(
       {
         name: 'weather-server',
@@ -38,31 +47,29 @@ class Weather {
     });
   }
 
-  async getWeatherData(lat: number, lng: number) {
+
+  async getWeatherData(lat: string, lng: string) {
     try {
-      this.axiosInstance = axios.create({
-        baseURL: `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}¤t=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m`,
-        timeout: 5000,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-      const response = await this.axiosInstance.get('');
+      const params = {
+        latitude: lat,
+        longitude: lng,
+        current: 'temperature_2m,wind_speed_10m',
+        hourly: 'temperature_2m,relative_humidity_2m,wind_speed_10m'
+      };
+
+      const response = await this.axiosInstance.get('', { params });
       return response.data;
     } catch (error: any) {
       console.error('[Error] Failed to fetch weather data:', error.message);
-      throw error; // Re-throw to allow calling function to handle the error
+      return 'Error';
     }
   }
+
 }
 
-
 server.tool("getWeather",
-  { lat: z.number(), lng: z.number() },
+  { lat: z.string(), lng: z.string() },
   async function({ lat, lng }) {
-
-
     const weatherInstance = new Weather();
     const weatherData = await weatherInstance.getWeatherData(lat, lng);
 
@@ -80,4 +87,5 @@ const run = async () => {
 }
 
 run();
+
 
