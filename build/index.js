@@ -63,7 +63,7 @@ server.tool("getWeather", { lat: zod_1.z.string(), lng: zod_1.z.string() }, asyn
     const weatherData = await weatherInstance.getWeatherData(lat, lng);
     return ({
         content: [{
-                type: "text", text: String(weatherData)
+                type: "text", text: JSON.stringify(weatherData, null, 2)
             }]
     });
 });

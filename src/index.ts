@@ -75,7 +75,7 @@ server.tool("getWeather",
 
     return ({
       content: [{
-        type: "text", text: String(weatherData)
+        type: "text", text: JSON.stringify(weatherData, null, 2)
       }]
     });
   }
