@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { z } from "zod";
 import axios from 'axios';
 
@@ -13,37 +12,18 @@ const server = new McpServer({
 });
 
 class Weather {
-  private server: Server;
   private axiosInstance: any;
 
   constructor() {
     console.error('[Setup] Initializing Weather server...');
 
     this.axiosInstance = axios.create({
-      baseURL: 'https://api.open-meteo.com/v1/forecast', // Base URL without parameters
+      baseURL: 'https://api.open-meteo.com/v1/forecast',
       timeout: 5000,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
-    });
-
-    this.server = new Server(
-      {
-        name: 'weather-server',
-        version: '0.1.0',
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
-      }
-    );
-
-    this.server.onerror = (error) => console.error('[Error]', error);
-    process.on('SIGINT', async () => {
-      await this.server.close();
-      process.exit(0);
     });
   }
 
